@@ -1,0 +1,9 @@
+node_modules/
+.vscode/
+.idea/
+generated/*.html
+generated/*.pdf
+playtest-archive/scratch/
+__pycache__/
+*.pyc
+.venv/
