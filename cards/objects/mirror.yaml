@@ -1,0 +1,13 @@
+id: mirror
+object: mirror
+base_line: "the mirror hangs above the sink."
+s_plus_7_line: "the antenna hangs above the cup."
+vignette: >-
+  the antenna hangs above the cup. the kitchen radio had rabbit ears
+  wrapped in tin foil, propped against a coffee cup to angle them just
+  so for the morning news. her father would tap the cup with one
+  finger whenever the static rose, as if the cup itself were the
+  problem. she never knew if the tapping helped, or if it was only a
+  habit.
+dictionary_id: common-nouns-v1
+dictionary_version: v1

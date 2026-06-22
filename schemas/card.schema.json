@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oulipo-memory-deck/schemas/card.schema.json",
+  "title": "Card",
+  "description": "One object card in the memory deck.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "object",
+    "base_line",
+    "s_plus_7_line",
+    "vignette",
+    "dictionary_id",
+    "dictionary_version"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "object": {
+      "type": "string",
+      "pattern": "^[a-z]+$"
+    },
+    "base_line": {
+      "type": "string",
+      "minLength": 1
+    },
+    "s_plus_7_line": {
+      "type": "string",
+      "minLength": 1
+    },
+    "vignette": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dictionary_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dictionary_version": {
+      "type": "string",
+      "pattern": "^v[0-9]+$"
+    }
+  }
+}
