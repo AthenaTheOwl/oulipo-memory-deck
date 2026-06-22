@@ -1,77 +1,73 @@
-# Oulipo Memory Deck
+# oulipo memory deck
 
-A narrative deckbuilder where everyday objects (kettle, hinge, key) become
-memory cards. Each card's description is run through Oulipo S+7 word-swaps
-to expose buried history.
+a tiny narrative deck. eight everyday objects -- kettle, hinge, key,
+lamp, mirror, radio, spoon, window -- become memory cards. each
+card's base line is run through an oulipo s+7 word swap to expose
+buried history, and the user writes a 40-80 word vignette using the
+uncanny output as a seed.
 
-## What this is
+the artifact is a single static html page. no javascript, no external
+assets, no model in the loop.
 
-Eight starter cards, each named for an everyday object. Each card has:
+## the s+7 swap
 
-- A base line — a literal description of the object.
-- An S+7 line — the same line with every noun replaced by the seventh
-  noun after it in a chosen dictionary.
-- A 40-80 word vignette written by the user that uses the S+7 line as a
-  prompt and treats the uncanny substitution as the seed of a memory.
+given a base line and a dictionary, replace every noun with the noun
+seven entries later in the dictionary, wrapping at the end. non-noun
+tokens (and tokens not in the dictionary) pass through unchanged.
+casing and trailing punctuation are preserved. the algorithm is
+intentionally small; edge cases (plurals, compounds) are handled by
+curating the dictionary, not by parser heuristics.
 
-The output is a single static HTML page the user opens locally. The whole
-deck fits in one browser tab.
+example, against `dictionaries/common-nouns.txt` v1:
 
-## Status
+```
+base:  the kettle sits on the stove.
+s+7:   the drawer sits on the spoon.
+```
 
-v0 scaffold. No cards, no S+7 script, no renderer. Spec 0001 defines
-the card YAML schema, the S+7 algorithm contract, the dictionary
-format, and the gates that land in spec 0002.
+the user then writes a 40-80 word vignette using the s+7 line as a
+prompt -- a kitchen remembered around a propped-open silverware drawer.
 
-## How to run
-
-Placeholder. Spec 0002 will ship:
+## first run
 
 ```bash
-python scripts/s_plus_7.py cards/kettle.yaml
-python scripts/render_html.py --out index.html
+uv sync
+python -m oulipo_memory_deck validate
 ```
 
-Then open `index.html` in a browser.
+`validate` (no args) checks all 8 cards against `schemas/card.schema.json`,
+re-runs the s+7 swap against the committed dictionary, and confirms
+each vignette is between 40 and 80 words. exits zero on a clean deck.
 
-## Layout
+to render the deck to a single static page:
 
-```
-.
-├── AGENTS.md
-├── LICENSE
-├── README.md
-├── docs/
-│   └── first-pr.md
-└── specs/
-    └── 0001-foundation/
-        ├── acceptance.md
-        ├── design.md
-        ├── requirements.md
-        └── tasks.md
+```bash
+python -m oulipo_memory_deck render --out generated/print.html
 ```
 
-Planned directories:
+then open `generated/print.html` in a browser.
 
-- `cards/`
-  - `objects/*.yaml` — one file per object card.
-- `dictionaries/`
-  - `common-nouns.txt` — the dictionary the S+7 swap walks.
-- `scripts/`
-  - `s_plus_7.py` — performs the substitution.
-  - `render_html.py` — assembles the single static page.
-- `templates/index.html` — page layout.
-- `generated/` — gitignored.
+## layout
 
-## Why this exists
+```
+oulipo_memory_deck/       # package: cli, swap, validate, render
+schemas/card.schema.json  # card shape (json schema draft 2020-12)
+dictionaries/
+  common-nouns.txt        # the committed dictionary (v1)
+  INDEX.json              # dictionary_id -> { file, version, provenance }
+cards/objects/*.yaml      # the eight starter cards
+tests/                    # pytest: schema, swap, render, no-network
+docs/                     # historical first-pr notes
+specs/                    # requirements / design / acceptance
+generated/                # gitignored render output
+```
 
-LLM-era writing tools converge on chat. An Oulipo-constrained card
-deck makes the opposite point: a small fixed rule plus a curated
-dictionary produces prose that is stranger and more useful than free
-generation. The deck is a tiny shippable artifact that demonstrates
-prompt-engineering taste through a literary constraint rather than a
-chat transcript.
+## why no model in the loop
 
-## License
+the literary constraint is the point. if a model writes the vignettes,
+the s+7 swap becomes ornamental rather than load-bearing. the swap
+provides the seed; the user provides the memory.
 
-MIT. See `LICENSE`.
+## license
+
+MIT. see `LICENSE`.
