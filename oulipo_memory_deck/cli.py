@@ -1,6 +1,7 @@
 """command-line entry point.
 
 usage:
+  python -m oulipo_memory_deck show              # ranked, readable deck table
   python -m oulipo_memory_deck validate          # default: validate all cards
   python -m oulipo_memory_deck render --out PATH # render deck to print.html
 """
@@ -17,6 +18,11 @@ def _build_parser() -> argparse.ArgumentParser:
         description="deterministic S+7 card deck",
     )
     sub = parser.add_subparsers(dest="cmd")
+
+    sub.add_parser(
+        "show",
+        help="print the committed deck as a ranked, readable table",
+    )
 
     sub.add_parser(
         "validate",
@@ -40,6 +46,9 @@ def main(argv: list[str] | None = None) -> int:
 
     cmd = args.cmd or "validate"
 
+    if cmd == "show":
+        from .show import show
+        return show(root)
     if cmd == "validate":
         from .validate import validate_all
         return validate_all(root)

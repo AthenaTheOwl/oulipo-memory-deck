@@ -62,6 +62,29 @@ specs/                    # requirements / design / acceptance
 generated/                # gitignored render output
 ```
 
+## live demo
+
+a no-arg `show` verb prints the committed deck as a ranked table:
+
+```bash
+python -m oulipo_memory_deck show
+```
+
+it lists all eight cards ranked by how many nouns the S+7 swap changes,
+with a headline finding and the most-transformed card spelled out.
+
+a streamlit card browser renders the same data interactively -- pick an
+object, see its base line, its S+7 line, and the seeded vignette:
+
+```bash
+python -m uv run --with streamlit streamlit run streamlit_app.py
+```
+
+deploy on streamlit cloud: repo `AthenaTheOwl/oulipo-memory-deck`,
+branch `main`, main file `streamlit_app.py`.
+
+<!-- live-url: (add the streamlit cloud url here once deployed) -->
+
 ## why no model in the loop
 
 the literary constraint is the point. if a model writes the vignettes,
