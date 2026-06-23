@@ -13,6 +13,7 @@ from pathlib import Path
 import streamlit as st
 
 from oulipo_memory_deck.show import load_rows
+from oulipo_memory_deck.swap import load_dictionary, swap
 
 ROOT = Path(__file__).resolve().parent
 
@@ -72,3 +73,65 @@ st.write(card["vignette"])
 st.caption(
     f"{card['swaps']} nouns swapped  |  {card['vignette_words']} words"
 )
+
+st.divider()
+st.subheader("run the S+7 transform on your own line")
+st.caption(
+    "type any line. it is run through the same deterministic "
+    "oulipo_memory_deck.swap.swap() function the deck was built with — "
+    "each dictionary noun is replaced by the one seven entries later. "
+    "words not in the dictionary pass through unchanged."
+)
+
+# load the real dictionary off disk (id + version + sha verified inside).
+dict_id = "common-nouns-v1"
+try:
+    dictionary, dict_ver, dict_sha = load_dictionary(dict_id, ROOT)
+except (KeyError, ValueError, FileNotFoundError) as exc:
+    st.error(f"could not load dictionary '{dict_id}': {exc}")
+    st.stop()
+
+st.caption(
+    f"dictionary: {dict_id} ({dict_ver}, {len(dictionary)} nouns, "
+    f"sha256 {dict_sha[:12]}…)"
+)
+
+user_line = st.text_input(
+    "your line",
+    value="the lamp hums beside the window.",
+    help="anything. nouns present in the dictionary get swapped +7.",
+)
+
+if user_line.strip():
+    # CALL THE REAL ENGINE — same swap() the committed deck uses.
+    result = swap(user_line, dictionary)
+
+    before = user_line.split()
+    after = result.split()
+    swaps = sum(1 for a, b in zip(before, after) if a != b)
+
+    st.markdown(f"**base line**  \n_{user_line}_")
+    st.markdown(f"**S+7 line**  \n**{result}**")
+
+    if swaps:
+        st.success(f"{swaps} word(s) swapped.")
+        # show the per-word mapping, only for tokens that actually changed.
+        changed = [
+            {"position": i + 1, "before": a, "after": b}
+            for i, (a, b) in enumerate(zip(before, after))
+            if a != b
+        ]
+        st.dataframe(changed, use_container_width=True, hide_index=True)
+    else:
+        st.info(
+            "no swaps — none of these words are in the dictionary. "
+            "try one of the dictionary nouns below."
+        )
+
+    with st.expander("dictionary nouns (the S+7 walk)"):
+        st.write(
+            "the +7 swap walks this exact ordered list, wrapping at the end:"
+        )
+        st.code("  ".join(dictionary), language=None)
+else:
+    st.info("enter a line above to run the transform.")
