@@ -1,96 +1,99 @@
-# oulipo memory deck
+# oulipo-memory-deck
 
-a tiny narrative deck. eight everyday objects -- kettle, hinge, key,
-lamp, mirror, radio, spoon, window -- become memory cards. each
-card's base line is run through an oulipo s+7 word swap to expose
-buried history, and the user writes a 40-80 word vignette using the
-uncanny output as a seed.
+Take a sentence about a kettle. Replace every noun with the one seven entries
+later in the dictionary. Now it's a sentence about a drawer that sits on a spoon,
+and somehow it has a whole kitchen behind it. That's the deck.
 
-the artifact is a single static html page. no javascript, no external
-assets, no model in the loop.
+## What it is
 
-## the s+7 swap
+Eight everyday objects — kettle, hinge, key, lamp, mirror, radio, spoon, window —
+each printed on a card. Every card carries one plain line about its object. Run
+that line through the Oulipo S+7 swap and it comes out the other side strange but
+not random, the way a half-remembered room is strange. Then you write a 40-to-80
+word vignette using the strange line as the seed.
 
-given a base line and a dictionary, replace every noun with the noun
-seven entries later in the dictionary, wrapping at the end. non-noun
-tokens (and tokens not in the dictionary) pass through unchanged.
-casing and trailing punctuation are preserved. the algorithm is
-intentionally small; edge cases (plurals, compounds) are handled by
-curating the dictionary, not by parser heuristics.
+The whole thing is one static HTML page. No JavaScript, no assets, no model in the
+loop. You can print it and play it at a table.
 
-example, against `dictionaries/common-nouns.txt` v1:
+## The S+7 swap
+
+Old Oulipo trick: take a dictionary, and replace every noun with the noun seven
+entries down the list (wrap around at the end). Verbs, articles, anything not a
+noun, pass through untouched. Casing and trailing punctuation survive.
 
 ```
 base:  the kettle sits on the stove.
 s+7:   the drawer sits on the spoon.
 ```
 
-the user then writes a 40-80 word vignette using the s+7 line as a
-prompt -- a kitchen remembered around a propped-open silverware drawer.
+The swap is kept deliberately dumb. Plurals and compounds aren't solved with parser
+cleverness; they're solved by curating the dictionary, which is the honest way to
+solve them. The constraint does the work, not a heuristic.
 
-## first run
-
-```bash
-uv sync
-python -m oulipo_memory_deck validate
-```
-
-`validate` (no args) checks all 8 cards against `schemas/card.schema.json`,
-re-runs the s+7 swap against the committed dictionary, and confirms
-each vignette is between 40 and 80 words. exits zero on a clean deck.
-
-to render the deck to a single static page:
-
-```bash
-python -m oulipo_memory_deck render --out generated/print.html
-```
-
-then open `generated/print.html` in a browser.
-
-## layout
-
-```
-oulipo_memory_deck/       # package: cli, swap, validate, render
-schemas/card.schema.json  # card shape (json schema draft 2020-12)
-dictionaries/
-  common-nouns.txt        # the committed dictionary (v1)
-  INDEX.json              # dictionary_id -> { file, version, provenance }
-cards/objects/*.yaml      # the eight starter cards
-tests/                    # pytest: schema, swap, render, no-network
-docs/                     # historical first-pr notes
-specs/                    # requirements / design / acceptance
-generated/                # gitignored render output
-```
-
-## live demo
-
-a no-arg `show` verb prints the committed deck as a ranked table:
+## Try it
 
 ```bash
 python -m oulipo_memory_deck show
 ```
 
-it lists all eight cards ranked by how many nouns the S+7 swap changes,
-with a headline finding and the most-transformed card spelled out.
+Prints the eight cards ranked by how violently the swap mangled them — most-changed
+first — and spells out the worst offender. Then validate the deck:
 
-a streamlit card browser renders the same data interactively -- pick an
-object, see its base line, its S+7 line, and the seeded vignette:
+```bash
+python -m oulipo_memory_deck validate
+```
+
+`validate` (no args) checks all eight cards against the schema, re-runs every swap
+against the committed dictionary, and confirms each vignette landed in the 40-to-80
+word window. Exits zero on a clean deck.
+
+## Live demo
+
+A Streamlit card browser: pick an object, see its plain line, its swapped line, and
+the vignette someone wrote from it.
 
 ```bash
 python -m uv run --with streamlit streamlit run streamlit_app.py
 ```
 
-deploy on streamlit cloud: repo `AthenaTheOwl/oulipo-memory-deck`,
-branch `main`, main file `streamlit_app.py`.
+Deploy on Streamlit Cloud: repo `AthenaTheOwl/oulipo-memory-deck`, branch `main`,
+main file `streamlit_app.py`.
 
 <!-- live-url: (add the streamlit cloud url here once deployed) -->
 
-## why no model in the loop
+## Render the printable deck
 
-the literary constraint is the point. if a model writes the vignettes,
-the s+7 swap becomes ornamental rather than load-bearing. the swap
-provides the seed; the user provides the memory.
+```bash
+python -m oulipo_memory_deck render --out generated/print.html
+```
 
-## license
+Open `generated/print.html` and print it. Paper deck, propped-open silverware
+drawer included.
 
-MIT. see `LICENSE`.
+## Why there's no model writing the vignettes
+
+If a model writes the vignette, the swap is just decoration — you could delete it
+and nothing would change. The point is the other way around: the constraint hands
+you a strange seed, and you do the remembering. The kettle becoming a drawer is the
+prompt. The kitchen is yours.
+
+## Layout
+
+```
+oulipo_memory_deck/       package: cli, swap, validate, render
+schemas/card.schema.json  the card shape
+dictionaries/             the committed dictionary (v1) + provenance index
+cards/objects/*.yaml      the eight starter cards
+tests/  specs/  docs/
+generated/                gitignored render output
+```
+
+## How it connects
+
+Part of the narrative cluster with the [starforge demos](https://github.com/AthenaTheOwl?tab=repositories&q=starforge)
+— small experiments in constraint-driven storytelling that share one prose source
+and ship as different playable shapes.
+
+## License
+
+MIT. See `LICENSE`.
