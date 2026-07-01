@@ -22,7 +22,16 @@ def _word_count(text: str) -> int:
 
 def validate_all(root: Path) -> int:
     schema_path = root / "schemas" / "card.schema.json"
-    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    # run from a directory that lacks schemas/ and the reader should see
+    # which file is missing, not a raw FileNotFoundError traceback.
+    try:
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    except OSError:
+        print(
+            f"{schema_path} not found; run from the repo root",
+            file=sys.stderr,
+        )
+        return 1
     validator = Draft202012Validator(schema)
 
     cards_dir = root / "cards" / "objects"
