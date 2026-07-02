@@ -8,6 +8,7 @@ plus a one-line headline finding.
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import yaml
@@ -32,26 +33,35 @@ def load_rows(root: Path) -> list[dict]:
     rows: list[dict] = []
     for path in files:
         card = yaml.safe_load(path.read_text(encoding="utf-8"))
-        did = card["dictionary_id"]
-        if did not in dict_cache:
-            dict_cache[did], _ver, _sha = load_dictionary(did, root)
-        dictionary = dict_cache[did]
-        rows.append(
-            {
-                "object": card["object"],
-                "base_line": card["base_line"],
-                "s_plus_7_line": card["s_plus_7_line"],
-                "vignette": card["vignette"],
-                "swaps": _swap_count(card["base_line"], dictionary),
-                "vignette_words": len(card["vignette"].split()),
-            }
-        )
+        # a hand-edited card can drop a required key; name the file so the
+        # reader edits the right one instead of chasing a raw KeyError.
+        try:
+            did = card["dictionary_id"]
+            if did not in dict_cache:
+                dict_cache[did], _ver, _sha = load_dictionary(did, root)
+            dictionary = dict_cache[did]
+            rows.append(
+                {
+                    "object": card["object"],
+                    "base_line": card["base_line"],
+                    "s_plus_7_line": card["s_plus_7_line"],
+                    "vignette": card["vignette"],
+                    "swaps": _swap_count(card["base_line"], dictionary),
+                    "vignette_words": len(card["vignette"].split()),
+                }
+            )
+        except (KeyError, TypeError) as exc:
+            raise ValueError(f"{path.name}: missing key {exc}") from exc
     rows.sort(key=lambda r: (-r["swaps"], r["object"]))
     return rows
 
 
 def show(root: Path) -> int:
-    rows = load_rows(root)
+    try:
+        rows = load_rows(root)
+    except ValueError as exc:
+        print(exc, file=sys.stderr)
+        return 1
     if not rows:
         print("no cards found in cards/objects/")
         return 1

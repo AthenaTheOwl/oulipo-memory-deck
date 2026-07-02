@@ -2,7 +2,20 @@
 
 from __future__ import annotations
 
-from oulipo_memory_deck.show import load_rows, show
+from oulipo_memory_deck.show import _swap_count, load_rows, show
+from oulipo_memory_deck.swap import load_dictionary
+
+
+def test_swap_count_pins_exact_value(repo_root):
+    # golden master: inverting the changed/unchanged comparison in
+    # _swap_count yields 3-4 here; pin the literal so that flips.
+    words, _ver, _sha = load_dictionary("common-nouns-v1", repo_root)
+    assert _swap_count("the kettle sits on the stove.", words) == 2
+
+
+def test_load_rows_swaps_are_all_two(repo_root):
+    rows = load_rows(repo_root)
+    assert [r["swaps"] for r in rows] == [2] * 8
 
 
 def test_load_rows_one_per_card_ranked(repo_root):
