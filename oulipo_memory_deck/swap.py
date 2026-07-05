@@ -50,7 +50,9 @@ def load_dictionary(dictionary_id: str, root: Path) -> tuple[list[str], str, str
     normalized = _normalize(dict_path.read_bytes())
     sha = hashlib.sha256(normalized).hexdigest()
     expected = entry.get("sha256")
-    if expected is not None and expected != sha:
+    if not expected:
+        raise ValueError(f"missing sha256 for {dictionary_id} in INDEX.json")
+    if expected != sha:
         raise ValueError(
             f"sha256 mismatch for {dictionary_id}: "
             f"expected {expected}, got {sha}"

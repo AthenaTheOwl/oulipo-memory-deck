@@ -9,7 +9,9 @@ from pathlib import Path
 import yaml
 from jsonschema import Draft202012Validator
 
+from .spec_check import check_specs
 from .swap import load_dictionary, swap
+from .voice_lint import lint_card
 
 
 VIGNETTE_MIN = 40
@@ -21,6 +23,11 @@ def _word_count(text: str) -> int:
 
 
 def validate_all(root: Path) -> int:
+    failures = 0
+    for error in check_specs(root):
+        print(f"spec_check: {error}")
+        failures += 1
+
     schema_path = root / "schemas" / "card.schema.json"
     # run from a directory that lacks schemas/ and the reader should see
     # which file is missing, not a raw FileNotFoundError traceback.
@@ -41,7 +48,6 @@ def validate_all(root: Path) -> int:
         print("no card files found in cards/objects/", file=sys.stderr)
         return 1
 
-    failures = 0
     for path in yaml_files:
         card = yaml.safe_load(path.read_text(encoding="utf-8"))
 
@@ -49,6 +55,13 @@ def validate_all(root: Path) -> int:
         if errors:
             for err in errors:
                 print(f"{path.name}: schema error: {err.message}")
+            failures += 1
+            continue
+
+        voice_errors = lint_card(card)
+        if voice_errors:
+            for err in voice_errors:
+                print(f"{path.name}: voice lint: {err}")
             failures += 1
             continue
 
@@ -90,7 +103,7 @@ def validate_all(root: Path) -> int:
         print(f"{path.name}: ok (vignette {wc} words)")
 
     if failures:
-        print(f"\n{failures} card(s) failed validation", file=sys.stderr)
+        print(f"\n{failures} validation failure(s)", file=sys.stderr)
         return 1
     print(f"\nall {len(yaml_files)} cards validate.")
     return 0

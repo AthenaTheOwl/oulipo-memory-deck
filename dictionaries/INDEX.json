@@ -2,6 +2,7 @@
   "common-nouns-v1": {
     "file": "common-nouns.txt",
     "version": "v1",
+    "sha256": "e91d046330700474c65cc1c579d4043b5b9a7911bd36207bfd4e9360982f523e",
     "provenance": "hand-curated common english nouns. singular, lowercase. ordering is the canonical S+7 walk. v0.1 ships a small thematic dictionary (40 entries) clustered into kitchen / door / light / electronics / furniture, which keeps +7 swaps inside a plausible register."
   }
 }
