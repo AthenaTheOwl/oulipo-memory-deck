@@ -25,6 +25,9 @@ jobs:
       - name: pytest
         run: python -m uv run --with pytest pytest -q
 
+      - name: validate-cli
+        run: python -m uv run python -m oulipo_memory_deck validate
+
       - name: compile python surfaces
         run: |
           python - <<'PY'
