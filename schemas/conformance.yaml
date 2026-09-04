@@ -1,0 +1,8 @@
+# Maps each schema to the files it governs, for scripts/validate_data_conformance.py.
+# validate_schemas.py checks the schema files themselves; this file is what
+# makes the schemas constrain the data they describe.
+version: 1
+mappings:
+  - schema: card.schema.json
+    files: ["cards/**/*.yaml"]
+    records: self
