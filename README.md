@@ -97,3 +97,7 @@ and ship as different playable shapes.
 ## License
 
 MIT. See `LICENSE`.
+
+## method update
+
+[dictionary editions change the mechanical constraint](docs/dictionary-edition-review.md).
