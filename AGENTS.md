@@ -5,8 +5,8 @@ Operating contract for AI agents working on this deck.
 ## What this repo is
 
 A tiny static-page card deck. Eight object cards, one S+7 substitution
-script, one HTML renderer, one dictionary file. The artifact is a
-single locally-opened `index.html` page.
+module, one HTML renderer, one dictionary file. The artifact is a
+single locally-opened page (`generated/print.html` by default).
 
 This is not a writing app, a chatbot, or a generator. The user writes
 every vignette by hand; the S+7 swap is the only mechanical
@@ -28,17 +28,28 @@ intervention.
 |---|---|
 | `card-author` | Names an object, writes a base line, writes the vignette |
 | `dictionary-keeper` | Owns `dictionaries/common-nouns.txt`; pins ordering |
-| `swap-engineer` | Maintains `scripts/s_plus_7.py` |
-| `renderer` | Maintains `scripts/render_html.py` and templates |
+| `swap-engineer` | Maintains `oulipo_memory_deck/swap.py` |
+| `renderer` | Maintains `oulipo_memory_deck/render.py` |
 
-## Gates (will land in spec 0002)
+## Gates
+
+CI runs these; run them before merging.
 
 ```bash
-python scripts/validate_cards.py
-python scripts/voice_lint.py
-python scripts/spec_check.py
-python scripts/s_plus_7.py --check-determinism
+uv run pytest
+python -m oulipo_memory_deck validate
+python scripts/validate_data_conformance.py
 ```
+
+`validate` is the one command that covers what the separate scripts
+in spec 0001 were planned to do: it runs `spec_check`
+(`oulipo_memory_deck/spec_check.py`), then for every card the schema,
+the voice lint on `base_line` and `vignette`
+(`oulipo_memory_deck/voice_lint.py`), the pinned-dictionary check, S+7
+determinism against the stored `s_plus_7_line`, and the 40-80 word
+vignette count. There is no `scripts/validate_cards.py`,
+`scripts/voice_lint.py`, `scripts/spec_check.py` or
+`scripts/s_plus_7.py`.
 
 ## Out of scope
 
