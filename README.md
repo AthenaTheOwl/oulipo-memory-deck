@@ -94,10 +94,10 @@ Part of the narrative cluster with the [starforge demos](https://github.com/Athe
 — small experiments in constraint-driven storytelling that share one prose source
 and ship as different playable shapes.
 
+## Method update
+
+[dictionary editions change the mechanical constraint](docs/dictionary-edition-review.md).
+
 ## License
 
 MIT. See `LICENSE`.
-
-## method update
-
-[dictionary editions change the mechanical constraint](docs/dictionary-edition-review.md).
